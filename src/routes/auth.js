@@ -31,7 +31,16 @@ router.post("/api/auth", async (req, res) => {
 });
 
 router.delete("/api/auth", async (req, res) => {
-  //
+  if (!req.body.refresh_token) return res.sendStatus(401);
+
+  const refresh_token = await RefreshToken.findOne({
+    value: req.body.refresh_token,
+  });
+
+  if (!refresh_token) return res.sendStatus(401);
+
+  await refresh_token.deleteOne();
+  return res.sendStatus(200);
 });
 
 router.post("/api/refresh", async (req, res) => {
