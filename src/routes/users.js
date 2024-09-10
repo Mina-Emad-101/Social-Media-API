@@ -41,7 +41,7 @@ router.put(
   verifyJWT,
   async (req, res) => {
     const result = validationResult(req);
-    if (!result.isEmpty()) return res.json({ validationError: result.array });
+    if (!result.isEmpty()) return res.json({ validationError: result.array() });
 
     const { username, email, password } = req.body;
 
@@ -64,7 +64,7 @@ router.patch(
   verifyJWT,
   async (req, res) => {
     const result = validationResult(req);
-    if (!result.isEmpty()) return res.json({ validationError: result.array });
+    if (!result.isEmpty()) return res.json({ validationError: result.array() });
 
     const { username, email, password } = req.body;
 
