@@ -12,7 +12,7 @@ const router = Router();
 
 router.get("/api/users", verifyJWT, async (req, res) => {
 	const user = await User.findById(req.user.id);
-	return res.json({ user: user });
+	return res.json(user);
 });
 
 router.post("/api/users", checkSchema(createSchema), async (req, res) => {
@@ -22,6 +22,7 @@ router.post("/api/users", checkSchema(createSchema), async (req, res) => {
 		username: username,
 		email: email,
 		password: password,
+		friends: [],
 	});
 
 	await user.save().catch((err) => {
