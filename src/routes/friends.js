@@ -19,7 +19,7 @@ router.post("/api/users/friends/:id", verifyJWT, async (req, res) => {
 
   if (user.friends.includes(id)) return res.sendStatus(403);
 
-  const friend = await User.findById(id);
+  const friend = await User.findById(id).catch((err) => console.log(err));
   if (!friend) return res.sendStatus(404);
 
   user.friends.push(friend.id);
