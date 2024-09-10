@@ -1,7 +1,7 @@
 import { Router } from "express";
 import User from "../models/user.js";
 import { verifyJWT } from "../utils/middlewares.js";
-import { checkSchema } from "express-validator";
+import { checkSchema, validationResult } from "express-validator";
 import {
 	createSchema,
 	patchSchema,
@@ -16,6 +16,10 @@ router.get("/api/users", verifyJWT, async (req, res) => {
 });
 
 router.post("/api/users", checkSchema(createSchema), async (req, res) => {
+	const result = validationResult(req);
+	if (!result.isEmpty())
+		return res.status(400).json({ validation_errors: result.array() });
+
 	const { username, email, password } = req.body;
 
 	const user = new User({
@@ -25,11 +29,10 @@ router.post("/api/users", checkSchema(createSchema), async (req, res) => {
 		friends: [],
 	});
 
-	await user.save().catch((err) => {
-		return res.json({ error: err });
-	});
-
-	return res.json(user);
+	await user.save().then(
+		(_) => res.json(user),
+		(err) => res.status(400).json({ error: err }),
+	);
 });
 
 router.put(
@@ -37,6 +40,9 @@ router.put(
 	checkSchema(putSchema),
 	verifyJWT,
 	async (req, res) => {
+		const result = validationResult(req);
+		if (!result.isEmpty()) return res.json({ validationError: result.array });
+
 		const { username, email, password } = req.body;
 
 		await User.updateOne(
@@ -57,6 +63,9 @@ router.patch(
 	checkSchema(patchSchema),
 	verifyJWT,
 	async (req, res) => {
+		const result = validationResult(req);
+		if (!result.isEmpty()) return res.json({ validationError: result.array });
+
 		const { username, email, password } = req.body;
 
 		const user = await User.findById(req.user.id);
