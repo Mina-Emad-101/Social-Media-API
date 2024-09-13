@@ -27,7 +27,11 @@ export const validateAuthorID = async (req, res, next) => {
   const post = await Post.findById(id).catch((err) => console.log(err));
   if (!post) return res.sendStatus(404);
 
-  if (req.user.id !== post.author_id.toString()) return res.sendStatus(403);
+  if (
+    req.user.id !== post.author_id.toString() &&
+    !req.user.friends.includes(post.author_id.toString())
+  )
+    return res.sendStatus(403);
 
   req.post = post;
 
