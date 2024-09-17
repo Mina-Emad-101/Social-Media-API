@@ -24,7 +24,6 @@ router.get("/api/posts", verifyJWT, async (req, res) => {
     post.liked_by_user = post.likes
       .map((like) => like.toString())
       .includes(req.user.id);
-    post.likes = post.likes.length;
     return post;
   });
 
@@ -42,7 +41,6 @@ router.get(
     post.liked_by_user = post.likes
       .map((like) => like.toString())
       .includes(req.user.id);
-    post.likes = post.likes.length;
 
     return res.json(post);
   },
@@ -58,7 +56,6 @@ router.get(
     comment.liked_by_user = comment.likes
       .map((like) => like.toString())
       .includes(req.user.id);
-    comment.likes = comment.likes.length;
 
     return res.json(comment);
   },
@@ -159,7 +156,7 @@ router.put(
   getPostFromID,
   validateAuthorID,
   checkSchema(putSchema),
-  upload.single("attachment"),
+  upload.array("attachment"),
   async (req, res) => {
     const { text } = req.body;
 
