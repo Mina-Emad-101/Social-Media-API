@@ -3,9 +3,8 @@ import path from "path";
 
 const fileStorageEngine = multer.diskStorage({
   destination: (req, file, done) =>
-    done(null, path.join(import.meta.dirname, "/../storage")),
-  filename: (req, file, done) =>
-    done(null, Date.now() + "-" + file.originalname),
+    done(null, path.join(import.meta.dirname, "/../public/attachments")),
+  filename: (req, file, done) => done(null, Date.now().toString()),
 });
 
 const upload = multer({ storage: fileStorageEngine });

@@ -30,7 +30,7 @@ router.post("/api/users", checkSchema(createSchema), async (req, res) => {
   });
 
   await user.save().then(
-    (_) => res.json(user),
+    (_) => res.json({ id: user.id }),
     (err) => res.status(400).json({ error: err }),
   );
 });

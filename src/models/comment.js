@@ -4,7 +4,12 @@ const { Schema, model } = mongoose;
 
 const schema = new Schema(
   {
-    author_id: {
+    post_id: {
+      type: Schema.Types.ObjectId,
+      ref: "Post",
+      required: true,
+    },
+    commenter_id: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
@@ -13,21 +18,10 @@ const schema = new Schema(
       type: String,
       required: true,
     },
-    attachments: [
-      {
-        type: String,
-      },
-    ],
     likes: [
       {
         type: Schema.Types.ObjectId,
         ref: "User",
-      },
-    ],
-    comments: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Comment",
       },
     ],
   },
@@ -36,6 +30,6 @@ const schema = new Schema(
   },
 );
 
-const Post = model("Post", schema);
+const Comment = model("Comment", schema);
 
-export default Post;
+export default Comment;
