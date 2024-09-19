@@ -1,5 +1,6 @@
 import { Router } from "express";
 import Post from "../models/post.js";
+import Comment from "../models/comment.js";
 import {
   getCommentFromID,
   getPostFromID,
@@ -10,7 +11,8 @@ import { checkSchema } from "express-validator";
 import { createSchema, putSchema } from "../validationSchemas/posts.js";
 import upload from "../utils/storage.js";
 import { createCommentSchema } from "../validationSchemas/comments.js";
-import Comment from "../models/comment.js";
+import Notification from "../models/notification.js";
+import { sendNotification } from "../utils/functions.js";
 
 const router = Router();
 
@@ -61,6 +63,12 @@ router.get(
   },
 );
 
+router.get("/api/notifications", verifyJWT, async (req, res) => {
+  const notifications = await Notification.find({ to: req.user.id });
+
+  return res.json({ data: notifications });
+});
+
 router.post(
   "/api/posts",
   verifyJWT,
@@ -76,7 +84,19 @@ router.post(
     });
 
     await post.save().then(
-      (_) => res.json({ id: post.id }),
+      async (_) => {
+        await Promise.all(
+          req.user.friends.map(async (friend_id) => {
+            await sendNotification(
+              req.user.id,
+              req.user.username,
+              friend_id,
+              "new_post",
+            );
+          }),
+        );
+        res.json({ id: post.id });
+      },
       (err) => res.status(500).json({ error: err }),
     );
   },
@@ -94,7 +114,15 @@ router.post(
     else post.likes.push(req.user.id);
 
     await post.save().then(
-      (_) => res.sendStatus(200),
+      async (post) => {
+        await sendNotification(
+          req.user.id,
+          req.user.username,
+          post.author_id,
+          "like_post",
+        );
+        return res.sendStatus(200);
+      },
       (err) => res.status(500).json({ error: err }),
     );
   },
@@ -118,11 +146,18 @@ router.post(
     post.comments.push(comment.id);
 
     await comment.save().then(
-      async (comment) =>
-        await post.save().then(
-          (_) => res.json({ id: comment.id }),
-          (err) => err,
-        ),
+      async (comment) => {
+        await post.save().catch((err) => res.status(500).json({ error: err }));
+
+        await sendNotification(
+          req.user.id,
+          req.user.username,
+          post.author_id,
+          "comment",
+        );
+
+        return res.json({ id: comment.id });
+      },
       (err) => res.status(500).json({ error: err }),
     );
   },
@@ -142,7 +177,16 @@ router.post(
     else comment.likes.push(req.user.id);
 
     await comment.save().then(
-      (_) => res.sendStatus(200),
+      async (comment) => {
+        await sendNotification(
+          req.user.id,
+          req.user.username,
+          comment.commenter_id,
+          "like_comment",
+        );
+
+        return res.sendStatus(200);
+      },
       (err) => res.status(500).json({ error: err }),
     );
   },
