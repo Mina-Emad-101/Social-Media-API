@@ -22,12 +22,14 @@ const schema = new Schema(
       {
         type: Schema.Types.ObjectId,
         ref: "User",
+        default: [],
       },
     ],
     comments: [
       {
         type: Schema.Types.ObjectId,
         ref: "Comment",
+        default: [],
       },
     ],
   },

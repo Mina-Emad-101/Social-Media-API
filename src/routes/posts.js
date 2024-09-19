@@ -73,7 +73,6 @@ router.post(
       author_id: req.user.id,
       text: text,
       attachments: req.files.map((file) => `/attachments/${file.filename}`),
-      likes: [],
     });
 
     await post.save().then(
@@ -114,7 +113,6 @@ router.post(
       post_id: post.id,
       commenter_id: req.user.id,
       text: text,
-      likes: [],
     });
 
     post.comments.push(comment.id);

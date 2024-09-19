@@ -26,7 +26,6 @@ router.post("/api/users", checkSchema(createSchema), async (req, res) => {
     username: username,
     email: email,
     password: password,
-    friends: [],
   });
 
   await user.save().then(
