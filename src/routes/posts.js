@@ -214,6 +214,19 @@ router.put(
   },
 );
 
+router.patch("/api/notifications/:id", verifyJWT, async (req, res) => {
+  await Notification.findById(req.params.id).then(
+    async (notification) => {
+      if (notification.to.toString() !== req.user.id)
+        return res.sendStatus(403);
+      notification.seen = !notification.seen;
+      await notification.save();
+      return res.sendStatus(200);
+    },
+    (_) => res.sendStatus(404),
+  );
+});
+
 router.delete(
   "/api/posts/:id",
   verifyJWT,
@@ -227,5 +240,28 @@ router.delete(
     );
   },
 );
+
+router.delete("/api/notifications", verifyJWT, async (req, res) => {
+  const notifications = await Notification.find({ to: req.user.id });
+
+  await Promise.all(
+    notifications.map(async (notification) => await notification.deleteOne()),
+  ).then(
+    (_) => res.sendStatus(200),
+    (err) => res.status(500).json({ error: err }),
+  );
+});
+
+router.delete("/api/notifications/:id", verifyJWT, async (req, res) => {
+  await Notification.findById(req.params.id).then(
+    async (notification) => {
+      if (notification.to.toString() !== req.user.id)
+        return res.sendStatus(403);
+      await notification.deleteOne();
+      return res.sendStatus(200);
+    },
+    (_) => res.sendStatus(404),
+  );
+});
 
 export default router;
