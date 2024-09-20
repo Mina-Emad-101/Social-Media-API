@@ -9,7 +9,11 @@ router.get("/api/friends", verifyJWT, async (req, res) => {
   return res.json({ data: friends });
 });
 
-router.post("/api/friends/:id", verifyJWT, async (req, res) => {
+router.get("/api/friend-requests", verifyJWT, (req, res) => {
+  return res.json({ data: req.user.friend_requests });
+});
+
+router.post("/api/friend-requests/:id", verifyJWT, async (req, res) => {
   const user = req.user;
   const id = req.params.id;
 
@@ -22,10 +26,40 @@ router.post("/api/friends/:id", verifyJWT, async (req, res) => {
   const friend = await User.findById(id).catch((err) => console.log(err));
   if (!friend) return res.sendStatus(404);
 
-  user.friends.push(friend.id);
-  await user.save().then(
+  if (
+    friend.friend_requests
+      .map((request) => request.toString())
+      .includes(user.id)
+  )
+    return res.sendStatus(403);
+
+  friend.friend_requests.push(user.id);
+  await friend.save().then(
     (_) => res.sendStatus(200),
     (err) => res.status(400).json({ error: err }),
+  );
+});
+
+router.post("/api/accept-friend-requests/:id", verifyJWT, async (req, res) => {
+  const user = req.user;
+  const id = req.params.id;
+
+  if (!user.friend_requests.map((req_id) => req_id.toString()).includes(id))
+    return res.sendStatus(404);
+
+  user.friend_requests = user.friend_requests.filter(
+    (req_id) => req_id.toString() !== id,
+  );
+  user.friends.push(id);
+
+  const friend = await User.findById(id);
+
+  friend.friends.push(user.id);
+
+  await friend.save().catch((err) => console.log(err));
+  await user.save().then(
+    (_) => res.sendStatus(200),
+    (err) => res.status(500).json({ error: err }),
   );
 });
 

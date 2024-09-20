@@ -16,6 +16,13 @@ const schema = new Schema({
     type: String,
     required: true,
   },
+  friend_requests: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      default: [],
+    },
+  ],
   friends: [
     {
       type: Schema.Types.ObjectId,
