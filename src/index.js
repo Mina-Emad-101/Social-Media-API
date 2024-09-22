@@ -13,7 +13,9 @@ const PORT = process.env.PORT;
 const app = express();
 
 mongoose
-  .connect("mongodb://127.0.0.1:27017/social")
+  .connect(
+    `mongodb+srv://mina:${process.env.DBPASSWORD}@cluster0.yjr3f.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`,
+  )
   .then(() => console.log("Connected to MongoDB"));
 
 // Middlewares
