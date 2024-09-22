@@ -7,7 +7,7 @@ import {
   validateAuthorID,
   verifyJWT,
 } from "../utils/middlewares.js";
-import { checkSchema } from "express-validator";
+import { checkSchema, validationResult } from "express-validator";
 import { createSchema, putSchema } from "../validationSchemas/posts.js";
 import upload from "../utils/storage.js";
 import { createCommentSchema } from "../validationSchemas/comments.js";
@@ -75,6 +75,9 @@ router.post(
   checkSchema(createSchema),
   upload.array("attachment"),
   async (req, res) => {
+    const result = validationResult(req);
+    if (!result.isEmpty()) return res.status(400).json(result.array());
+
     const { text } = req.body;
 
     const post = new Post({
@@ -134,6 +137,9 @@ router.post(
   getPostFromID,
   checkSchema(createCommentSchema),
   async (req, res) => {
+    const result = validationResult(req);
+    if (!result.isEmpty()) return res.status(400).json(result.array());
+
     const { text } = req.body;
     const post = req.post;
 
@@ -200,6 +206,9 @@ router.put(
   checkSchema(putSchema),
   upload.array("attachment"),
   async (req, res) => {
+    const result = validationResult(req);
+    if (!result.isEmpty()) return res.status(400).json(result.array());
+
     const { text } = req.body;
 
     const post = req.post;
