@@ -13,10 +13,10 @@ const PORT = process.env.PORT;
 const app = express();
 
 mongoose
-  .connect(
-    `mongodb+srv://mina:${process.env.DBPASSWORD}@cluster0.yjr3f.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`,
-  )
-  .then(() => console.log("Connected to MongoDB"));
+	.connect(
+		`mongodb+srv://mina:${process.env.DBPASSWORD}@cluster0.yjr3f.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&authSource=social`,
+	)
+	.then(() => console.log("Connected to MongoDB"));
 
 // Middlewares
 app.use(express.json());
@@ -30,5 +30,5 @@ app.use(friendsRouter);
 app.use(postsRouter);
 
 app.listen(PORT, HOST, () => {
-  console.log(`Listening on ${HOST}:${PORT}`);
+	console.log(`Listening on ${HOST}:${PORT}`);
 });
