@@ -72,8 +72,8 @@ router.get("/api/notifications", verifyJWT, async (req, res) => {
 router.post(
   "/api/posts",
   verifyJWT,
-  checkSchema(createSchema),
   upload.array("attachment"),
+  checkSchema(createSchema),
   async (req, res) => {
     const result = validationResult(req);
     if (!result.isEmpty()) return res.status(400).json(result.array());
