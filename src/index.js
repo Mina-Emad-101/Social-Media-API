@@ -14,7 +14,7 @@ const app = express();
 
 mongoose
 	.connect(
-		`mongodb+srv://mina:${process.env.DBPASSWORD}@cluster0.yjr3f.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&authSource=social`,
+		`mongodb+srv://mina:${process.env.DBPASSWORD}@cluster0.yjr3f.mongodb.net/social?retryWrites=true&w=majority&appName=Cluster0`,
 	)
 	.then(() => console.log("Connected to MongoDB"));
 
