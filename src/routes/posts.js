@@ -203,8 +203,8 @@ router.put(
   verifyJWT,
   getPostFromID,
   validateAuthorID,
-  checkSchema(putSchema),
   upload.array("attachment"),
+  checkSchema(putSchema),
   async (req, res) => {
     const result = validationResult(req);
     if (!result.isEmpty()) return res.status(400).json(result.array());
