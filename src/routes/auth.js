@@ -2,6 +2,7 @@ import { Router } from "express";
 import User from "../models/user.js";
 import jwt from "jsonwebtoken";
 import RefreshToken from "../models/refreshToken.js";
+import { verifyJWT } from "../utils/middlewares.js";
 
 const router = Router();
 
@@ -32,7 +33,7 @@ router.post("/api/auth", async (req, res) => {
 	return res.json({ access_token: access_token, refresh_token: refresh_token });
 });
 
-router.delete("/api/auth", async (req, res) => {
+router.delete("/api/auth", verifyJWT, async (req, res) => {
 	const refresh_token = await RefreshToken.findOne({
 		owner_id: req.user.id,
 	});
