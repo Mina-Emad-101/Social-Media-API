@@ -206,12 +206,14 @@ router.put(
   upload.array("attachment"),
   checkSchema(putSchema),
   async (req, res) => {
+    const post = req.post;
+
+    if (post.id !== req.user.id) return res.sendStatus(403);
+
     const result = validationResult(req);
     if (!result.isEmpty()) return res.status(400).json(result.array());
 
     const { text } = req.body;
-
-    const post = req.post;
 
     post.text = text;
     post.attachment = req.files.map((file) => `/attachments/${file.filename}`);
@@ -243,6 +245,7 @@ router.delete(
   validateAuthorID,
   async (req, res) => {
     const post = req.post;
+    await Comment.deleteMany({ commenter_id: post.author_id });
     await post.deleteOne().then(
       (_) => res.json(post),
       (err) => res.status(400).json({ error: err }),
@@ -252,6 +255,8 @@ router.delete(
 
 router.delete("/api/notifications", verifyJWT, async (req, res) => {
   const notifications = await Notification.find({ to: req.user.id });
+
+  if (!notifications) return res.sendStatus(404);
 
   await Promise.all(
     notifications.map(async (notification) => await notification.deleteOne()),
